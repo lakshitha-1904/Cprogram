@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+struct Node {
+    char data;
+    struct Node* next;
+};
+void push(struct Node** top_ref, char character);
+char pop(struct Node** top_ref);
+bool is_empty(struct Node* top);
+void free_stack(struct Node** top_ref);
+bool is_matching_pair(char char1, char char2);
+bool are_brackets_balanced(char expression[]);
+
+int main() {
+    char expression[100];
+    printf("Enter an expression: ");
+    scanf("%99[^\n]", expression); 
+    if (are_brackets_balanced(expression)) {
+        printf("Result: The brackets are balanced.\n");
+    } else {
+        printf("Result: The brackets are NOT balanced.\n");
+    }
+
+    return 0;
+}
+bool are_brackets_balanced(char expression[]) {
+    struct Node* stack = NULL;
+    int i = 0;
+
+    while (expression[i] != '\0') {
+        if (expression[i] == '{' || expression[i] == '(' || expression[i] == '[') {
+            push(&stack, expression[i]);
+        }
+        else if (expression[i] == '}' || expression[i] == ')' || expression[i] == ']') {
+            
+            // Found a closing bracket but stack is empty -> Unbalanced
+            if (is_empty(stack)) {
+                return false;
+            }
+
+            char popped_char = pop(&stack);
+            if (!is_matching_pair(popped_char, expression[i])) {
+                free_stack(&stack); // Clean up memory before returning
+                return false;
+            }
+        }
+        i++;
+    }
+
+    // If stack is completely empty, all brackets were matched
+    bool balanced = is_empty(stack);
+    free_stack(&stack);
+    return balanced;
+}
+
+// Check if opening and closing brackets match
+bool is_matching_pair(char char1, char char2) {
+    if (char1 == '(' && char2 == ')') return true;
+    if (char1 == '{' && char2 == '}') return true;
+    if (char1 == '[' && char2 == ']') return true;
+    return false;
+}
+
+// Push an element onto the stack
+void push(struct Node** top_ref, char character) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    if (new_node == NULL) {
+        printf("Stack overflow (Memory allocation failed).\n");
+        exit(1);
+    }
+    new_node->data = character;
+    new_node->next = *top_ref;
+    *top_ref = new_node;
+}
+
+// Pop an element from the stack
+char pop(struct Node** top_ref) {
+    struct Node* temp = *top_ref;
+    char popped_data = temp->data;
+    *top_ref = temp->next;
+    free(temp);
+    return popped_data;
+}
+
+// Check if the stack is empty
+bool is_empty(struct Node* top) {
+    return (top == NULL);
+}
+
+// Free memory to prevent leaks
+void free_stack(struct Node** top_ref) {
+    struct Node* current = *top_ref;
+    struct Node* next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *top_ref = NULL;
+}
