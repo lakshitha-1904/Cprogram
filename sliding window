@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#define ROW 4
+#define COL 4
+int compare(const void* a, const void* b) {
+    return (*(int*)a - *(int*)b);
+}
+int findMinAbsDiffInSubmatrix(int matrix[ROW][COL], int K) {
+    int min_global_diff = INT_MAX;
+    int submatrix_size = K * K;
+    int* window_elements = (int*)malloc(submatrix_size * sizeof(int));
+    if (window_elements == NULL) {
+        printf("Memory allocation failed!\n");
+        return -1;
+    }
+    for (int r = 0; r <= ROW - K; r++) {
+        for (int c = 0; c <= COL - K; c++) {
+            int index = 0;
+            for (int i = 0; i < K; i++) {
+                for (int j = 0; j < K; j++) {
+                    window_elements[index++] = matrix[r + i][c + j];
+                }
+            }
+            qsort(window_elements, submatrix_size, sizeof(int), compare);
+
+            for (int i = 1; i < submatrix_size; i++) {
+                int diff = window_elements[i] - window_elements[i - 1];
+                if (diff < min_global_diff) {
+                    min_global_diff = diff;
+                }
+            }
+        }
+    }
+
+    // Free allocated heap memory
+    free(window_elements);
+    
+    return min_global_diff;
+}
+
+int main() {
+    // Example 4x4 Input Matrix
+    int matrix[ROW][COL] = {
+        {12, 35, 10, 40},
+        {22, 19, 15, 82},
+        {60, 44, 29, 31},
+        {75, 11, 95, 50}
+    };
+    
+    int K = 2; // Size of the sliding submatrix (2x2)
+
+    int result = findMinAbsDiffInSubmatrix(matrix, K);
+    
+    if (result != -1) {
+        printf("The Minimum Absolute Difference in a %dx%d sliding submatrix is: %d\n", K, K, result);
+    }
+
+    return 0;
+}
