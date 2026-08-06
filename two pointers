@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Function to find two elements that sum up to the target
+bool find_two_sum(int arr[], int size, int target, int* res1, int* res2) {
+    int left = 0;             // Pointer 1: Starts at the beginning
+    int right = size - 1;     // Pointer 2: Starts at the end
+
+    while (left < right) {
+        int current_sum = arr[left] + arr[right];
+
+        // Case 1: Match found
+        if (current_sum == target) {
+            *res1 = arr[left];
+            *res2 = arr[right];
+            return true;
+        }
+        // Case 2: Sum is too small -> move left pointer rightward to get a larger value
+        else if (current_sum < target) {
+            left++;
+        }
+        // Case 3: Sum is too big -> move right pointer leftward to get a smaller value
+        else {
+            right--;
+        }
+    }
+    return false; // No pair found
+}
+
+int main() {
+    // Input array MUST be sorted for the two-pointer technique to work
+    int arr[] = {2, 4, 7, 11, 15, 22};
+    int size = sizeof(arr) / sizeof(arr[0]);
+    int target;
+    int res1 = 0, res2 = 0;
+
+    printf("Array: [2, 4, 7, 11, 15, 22]\n");
+    printf("Enter target sum: ");
+    scanf("%d", &target);
+
+    if (find_two_sum(arr, size, target, &res1, &res2)) {
+        printf("Pair found: %d + %d = %d\n", res1, res2, target);
+    } else {
+        printf("No pair exists in the array that sums up to %d.\n", target);
+    }
+
+    return 0;
+}
