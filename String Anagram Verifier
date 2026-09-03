@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+
+int checkAnagram(const char *str1, const char *str2) {
+    int frequencyMap[256] = {0}; // Initialize count tracking slots for ASCII letters
+
+    // If string lengths do not match, they cannot be anagrams
+    if (strlen(str1) != strlen(str2)) return 0;
+
+    // Increment count for first string, decrement for second string
+    for (int i = 0; str1[i] != '\0'; i++) {
+        frequencyMap[(unsigned char)str1[i]]++;
+        frequencyMap[(unsigned char)str2[i]]--;
+    }
+
+    // If the strings match perfectly, all frequency counters must be exactly zero
+    for (int i = 0; i < 256; i++) {
+        if (frequencyMap[i] != 0) return 0; 
+    }
+
+    return 1;
+}
+
+int main() {
+    const char word1[] = "listen";
+    const char word2[] = "silent";
+
+    printf("Comparing word parameters: '%s' vs '%s'\n", word1, word2);
+    if (checkAnagram(word1, word2)) {
+        printf("Result: The words are valid anagram patterns.\n");
+    } else {
+        printf("Result: Words match alternative structures, not anagrams.\n");
+    }
+
+    return 0;
+}
