@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+
+// Splitting function matching string characters manually
+void splitString(const char *input, char delimiter) {
+    char buffer[100];
+    int bufferIdx = 0;
+    int i = 0;
+
+    printf("Parsing components:\n");
+    while (input[i] != '\0') {
+        if (input[i] == delimiter) {
+            buffer[bufferIdx] = '\0'; // Terminate current token slice
+            if (bufferIdx > 0) {
+                printf(" - %s\n", buffer);
+            }
+            bufferIdx = 0; // Reset token container index
+        } else {
+            buffer[bufferIdx++] = input[i];
+        }
+        i++;
+    }
+    
+    // Catch final string segment remaining after last token marker
+    buffer[bufferIdx] = '\0';
+    if (bufferIdx > 0) {
+        printf(" - %s\n", buffer);
+    }
+}
+
+int main() {
+    const char dataRecord[] = "Apple,Banana,Orange,Pineapple";
+    printf("Raw Record: %s\n\n", dataRecord);
+    splitString(dataRecord, ',');
+    return 0;
+}
