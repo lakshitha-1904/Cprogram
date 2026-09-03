@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <string.h>
+
+// Function to encrypt or decrypt text using an identical XOR key mask
+void xorCipher(char *message, char key) {
+    int length = strlen(message);
+    for (int i = 0; i < length; i++) {
+        message[i] = message[i] ^ key; // Performs bitwise XOR operation
+    }
+}
+
+int main() {
+    char data[] = "Secret_Password_123";
+    char cipherKey = 'K'; // Simple 8-bit key mask
+
+    printf("Original Text  : %s\n", data);
+
+    // First XOR operation encrypts the data
+    xorCipher(data, cipherKey);
+    printf("Encrypted Text : ");
+    for(int i = 0; i < strlen(data); i++) {
+        printf("\\x%02X", (unsigned char)data[i]); // Print as hex codes
+    }
+    printf("\n");
+
+    // Second consecutive XOR operation reverts data back to plaintext
+    xorCipher(data, cipherKey);
+    printf("Decrypted Text : %s\n", data);
+
+    return 0;
+}
