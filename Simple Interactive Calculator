@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+int main() {
+    char operator;
+    double num1, num2, result;
+    int running = 1;
+
+    while (running) {
+        printf("\n=== Interactive Calculator ===\n");
+        printf("Enter operator (+, -, *, /) or 'Q' to quit: ");
+        scanf(" %c", &operator);
+
+        if (operator == 'Q' || operator == 'q') {
+            printf("Exiting calculator engine.\n");
+            running = 0;
+            continue;
+        }
+
+        printf("Enter two numbers separated by a space: ");
+        if (scanf("%lf %lf", &num1, &num2) != 2) {
+            printf("Error: Invalid numerical values entered.\n");
+            while (getchar() != '\n'); // Clear the corrupt input buffer
+            continue;
+        }
+
+        switch (operator) {
+            case '+': result = num1 + num2; printf("Result: %.2lf\n", result); break;
+            case '-': result = num1 - num2; printf("Result: %.2lf\n", result); break;
+            case '*': result = num1 * num2; printf("Result: %.2lf\n", result); break;
+            case '/':
+                if (num2 == 0.0) {
+                    printf("Error: Division by zero is mathematically undefined.\n");
+                } else {
+                    result = num1 / num2;
+                    printf("Result: %.2lf\n", result);
+                }
+                break;
+            default:
+                printf("Error: Unknown operator symbol entered.\n");
+        }
+    }
+    return 0;
+}
