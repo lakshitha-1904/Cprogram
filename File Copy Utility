@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    FILE *sourceFile, *destFile;
+    char ch;
+
+    // Check if the user passed both source and destination arguments
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <source_file> <destination_file>\n", argv[0]);
+        return 1;
+    }
+
+    // Open source file in read mode
+    sourceFile = fopen(argv[1], "r");
+    if (sourceFile == NULL) {
+        perror("Error opening source file");
+        return 2;
+    }
+
+    // Open destination file in write mode
+    destFile = fopen(argv[2], "w");
+    if (destFile == NULL) {
+        perror("Error creating destination file");
+        fclose(sourceFile);
+        return 3;
+    }
+
+    // Copy byte by byte from source to destination
+    while ((ch = fgetc(sourceFile)) != EOF) {
+        fputc(ch, destFile);
+    }
+
+    printf("File copied successfully from %s to %s\n", argv[1], argv[2]);
+
+    // Close open file streams
+    fclose(sourceFile);
+    fclose(destFile);
+
+    return 0;
+}
