@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main() {
+    FILE *filePtr;
+    char filename[] = "sample.txt";
+    char character;
+    int lineCounter = 1;
+
+    filePtr = fopen(filename, "r");
+    if (filePtr == NULL) {
+        // Notice: Creates an empty placeholder file for testing if it's missing
+        printf("Creating a mock file '%s' for demonstration...\n", filename);
+        filePtr = fopen(filename, "w");
+        if (filePtr == NULL) return 1;
+        fprintf(filePtr, "First Line\nSecond Line\nThird Line\n");
+        fclose(filePtr);
+        
+        // Re-open in read-only mode
+        filePtr = fopen(filename, "r");
+    }
+
+    // Read byte chunks until the End Of File marker is hit
+    while ((character = fgetc(filePtr)) != EOF) {
+        if (character == '\n') {
+            lineCounter++;
+        }
+    }
+
+    printf("Total number of text lines inside '%s': %d\n", filename, lineCounter);
+    fclose(filePtr);
+    return 0;
+}
