@@ -1,0 +1,45 @@
+// Function to find the maximum length of a contiguous subarray with equal number of 0s and 1s
+int findMaxLength(int* nums, int numsSize) {
+    int maxLen = 0;
+    int count = 0;
+    
+    // The range of count can be from -numsSize to +numsSize.
+    // Total distinct values = 2 * numsSize + 1
+    int mapSize = 2 * numsSize + 1;
+    int* map = (int*)malloc(mapSize * sizeof(int));
+    
+    // Initialize map with -2 to indicate that the count hasn't been seen yet
+    for (int i = 0; i < mapSize; i++) {
+        map[i] = -2;
+    }
+    
+    // A relative count of 0 is conceptually seen before the array starts (at index -1)
+    // Offset by numsSize to avoid negative array indices
+    map[numsSize] = -1;
+    
+    for (int i = 0; i < numsSize; i++) {
+        // Increment for 1, decrement for 0
+        if (nums[i] == 1) {
+            count++;
+        } else {
+            count--;
+        }
+        
+        // Shift count by numsSize to safely map it to a positive array index
+        int mapIndex = count + numsSize;
+        
+        if (map[mapIndex] >= -1) {
+            // Count has been seen before, calculate the length of the subarray
+            int currentLen = i - map[mapIndex];
+            if (currentLen > maxLen) {
+                maxLen = currentLen;
+            }
+        } else {
+            // First time seeing this relative count, record the first index where it appeared
+            map[mapIndex] = i;
+        }
+    }
+    
+    free(map); // Clean up allocated memory
+    return maxLen;
+}
