@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <limits.h>
+
+// Function to find the maximum length of a set using Approach #3
+int arrayNesting(int* nums, int numsSize) {
+    int maxLen = 0;
+    
+    for (int i = 0; i < numsSize; i++) {
+        // If the element is already visited (marked as -1), skip it
+        if (nums[i] == -1) {
+            continue;
+        }
+        
+        int currentLen = 0;
+        int currentIdx = i;
+        
+        // Traverse the cycle until we hit an already visited element
+        while (nums[currentIdx] != -1) {
+            int nextIdx = nums[currentIdx];
+            
+            // Mark the current element as visited
+            nums[currentIdx] = -1;
+            
+            // Move to the next index in the cycle
+            currentIdx = nextIdx;
+            currentLen++;
+        }
+        
+        // Update the maximum length found so far
+        if (currentLen > maxLen) {
+            maxLen = currentLen;
+        }
+    }
+    
+    return maxLen;
+}
