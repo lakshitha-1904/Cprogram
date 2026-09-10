@@ -1,0 +1,50 @@
+// REMOVE OR COMMENT OUT THE STRUCT DEFINITION:
+// struct TreeNode {
+//     int val;
+//     struct TreeNode* left;
+//     struct TreeNode* right;
+// };
+
+// Structure to hold the result of the post-order traversal for each subtree
+struct SubtreeInfo {
+    int sum;
+    int count;
+};
+
+// Global variable to keep track of matching nodes
+int matchingNodesCount = 0;
+
+// Recursive function that returns a structure containing the sum and count of nodes
+struct SubtreeInfo postOrder(struct TreeNode* root) {
+    struct SubtreeInfo currentResult = {0, 0};
+    
+    // Base case: if root is NULL, return sum = 0 and count = 0
+    if (root == NULL) {
+        return currentResult;
+    }
+    
+    // Recursively call for left and right subtrees
+    struct SubtreeInfo leftResult = postOrder(root->left);
+    struct SubtreeInfo rightResult = postOrder(root->right);
+    
+    // Calculate total sum and count for the current subtree
+    currentResult.sum = leftResult.sum + rightResult.sum + root->val;
+    currentResult.count = leftResult.count + rightResult.count + 1;
+    
+    // Find the average (rounded down automatically via integer division)
+    int average = currentResult.sum / currentResult.count;
+    
+    // If the average matches the current node's value, increment global count
+    if (average == root->val) {
+        matchingNodesCount++;
+    }
+    
+    return currentResult;
+}
+
+// Main function to wrap the logic and return the final answer
+int averageOfSubtree(struct TreeNode* root) {
+    matchingNodesCount = 0; // Reset count for every invocation
+    postOrder(root);
+    return matchingNodesCount;
+}
