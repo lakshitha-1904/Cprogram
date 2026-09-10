@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to store individual historical updates
+typedef struct {
+    int snap_id;
+    int val;
+} Record;
+
+// Structure representing the historical timeline for one array index
+typedef struct {
+    Record* records;
+    int size;
+    int capacity;
+} HistoryList;
+
+// Main structure for the Snapshot Array
+typedef struct {
+    HistoryList* history;
+    int length;
+    int current_snap_id;
+} SnapshotArray;
+
+// Initializes the data structure
+SnapshotArray* snapshotArrayCreate(int length) {
+    SnapshotArray* obj = (SnapshotArray*)malloc(sizeof(SnapshotArray));
+    obj->length = length;
+    obj->current_snap_id = 0;
+    obj->history = (HistoryList*)malloc(length * sizeof(HistoryList));
+    
+    for (int i = 0; i < length; i++) {
+        obj->history[i].capacity = 2;
+        obj->history[i].size = 1;
+        obj->history[i].records = (Record*)malloc(obj->history[i].capacity * sizeof(Record));
+        // Initialize with [0, 0] as instructed
+        obj->history[i].records[0].snap_id = 0;
+        obj->history[i].records[0].val = 0;
+    }
+    return obj;
+}
+
+// Sets the value at a specific index for the current snap_id
+void snapshotArraySet(SnapshotArray* obj, int index, int val) {
+    HistoryList* list = &obj->history[index];
+    int current_snap = obj->current_snap_id;
+    
+    // If the last record matches the current snap_id, overwrite it directly
+    if (list->size > 0 && list->records[list->size - 1].snap_id == current_snap) {
+        list->records[list->size - 1].val = val;
+        return;
+    }
+    
+    // Dynamic resizing if capacity is full
+    if (list->size >= list->capacity) {
+        list->capacity *= 2;
+        list->records = (Record*)realloc(list->records, list->capacity * sizeof(Record));
+    }
+    
+    // Append the new historical record
+    list->records[list->size].snap_id = current_snap;
+    list->records[list->size].val = val;
+    list->size++;
+}
+
+// Takes a snapshot and returns the snap_id
+int snapshotArraySnap(SnapshotArray* obj) {
+    return obj->current_snap_id++;
+}
+
+// Retrieves the value using Binary Search (upper_bound variant)
+int snapshotArrayGet(SnapshotArray* obj, int index, int snap_id) {
+    HistoryList* list = &obj->history[index];
+    
+    int low = 0;
+    int high = list->size - 1;
+    int ans_idx = 0;
+    
+    // Binary search for the rightmost snap_id <= target snap_id
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (list->records[mid].snap_id <= snap_id) {
+            ans_idx = mid;     // Potential answer found
+            low = mid + 1;     // Try to find a closer snap_id on the right
+        } else {
+            high = mid - 1;    // Target must be on the left
+        }
+    }
+    
+    return list->records[ans_idx].val;
+}
+
+// Frees all allocated memory
+void snapshotArrayFree(SnapshotArray* obj) {
+    if (!obj) return;
+    for (int i = 0; i < obj->length; i++) {
+        free(obj->history[i].records);
+    }
+    free(obj->history);
+    free(obj);
+}
