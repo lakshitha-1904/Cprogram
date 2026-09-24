@@ -1,0 +1,21 @@
+SinglyLinkedListNode* insertNodeAtTail(SinglyLinkedListNode* head, int data) {
+    // 1. Create a new node using the helper function provided in your template
+    SinglyLinkedListNode* newNode = create_singly_linked_list_node(data);
+
+    // 2. Case 1: If the list is currently empty, the new node becomes the head
+    if (head == NULL) {
+        return newNode;
+    }
+
+    // 3. Case 2: If the list is not empty, traverse to the last node
+    SinglyLinkedListNode* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    // 4. Link the final node's next pointer to our new node
+    current->next = newNode;
+
+    // 5. Return the original head pointer of the list
+    return head;
+}
