@@ -1,0 +1,105 @@
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+
+struct MapNode {
+    int val;
+    int left;
+    int right;
+    struct MapNode* next;
+};
+
+#define HASH_SIZE 10007
+
+unsigned int hash(int key) {
+    return (unsigned int)(key < 0 ? -key : key) % HASH_SIZE;
+}
+
+void insertMap(struct MapNode** table, int val, int left, int right) {
+    unsigned int h = hash(val);
+    struct MapNode* curr = table[h];
+    while (curr) {
+        if (curr->val == val) {
+            // Keep the one with shorter length or first occurrence
+            int lenOld = curr->right - curr->left;
+            int lenNew = right - left;
+            if (lenNew < lenOld) {
+                curr->left = left;
+                curr->right = right;
+            }
+            return;
+        }
+        curr = curr->next;
+    }
+    struct MapNode* node = (struct MapNode*)malloc(sizeof(struct MapNode));
+    node->val = val;
+    node->left = left;
+    node->right = right;
+    node->next = table[h];
+    table[h] = node;
+}
+
+void getMap(struct MapNode** table, int val, int* left, int* right) {
+    unsigned int h = hash(val);
+    struct MapNode* curr = table[h];
+    while (curr) {
+        if (curr->val == val) {
+            *left = curr->left;
+            *right = curr->right;
+            return;
+        }
+        curr = curr->next;
+    }
+    *left = -1;
+    *right = -1;
+}
+
+void freeMap(struct MapNode** table) {
+    for (int i = 0; i < HASH_SIZE; i++) {
+        struct MapNode* curr = table[i];
+        while (curr) {
+            struct MapNode* temp = curr;
+            curr = curr->next;
+            free(temp);
+        }
+    }
+}
+
+int** substringXorQueries(char* s, int** queries, int queriesSize, int* queriesColSize, int* returnSize, int** returnColumnSizes) {
+    struct MapNode* table[HASH_SIZE] = {0};
+    int n = strlen(s);
+
+    // Precompute substrings with length up to 30
+    for (int i = 0; i < n; i++) {
+        long long val = 0;
+        if (s[i] == '0') {
+            insertMap(table, 0, i, i);
+            continue;
+        }
+        for (int j = i; j < n && (j - i < 30); j++) {
+            val = (val << 1) | (s[j] - '0');
+            insertMap(table, (int)val, i, j);
+        }
+    }
+
+    *returnSize = queriesSize;
+    int** res = (int**)malloc(queriesSize * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(queriesSize * sizeof(int));
+
+    for (int i = 0; i < queriesSize; i++) {
+        int first = queries[i][0];
+        int second = queries[i][1];
+        int target = first ^ second;
+
+        res[i] = (int*)malloc(2 * sizeof(int));
+        (*returnColumnSizes)[i] = 2;
+
+        int l = -1, r = -1;
+        getMap(table, target, &l, &r);
+        res[i][0] = l;
+        res[i][1] = r;
+    }
+
+    freeMap(table);
+    return res;
+}
