@@ -1,0 +1,54 @@
+#include <stdlib.h>
+
+typedef struct {
+    int* data;     // The array holding the stack elements
+    int top;       // Index of the top element (-1 when empty)
+    int maxSize;   // Maximum capacity of the stack
+} CustomStack;
+
+// Initializes the stack with maxSize
+CustomStack* customStackCreate(int maxSize) {
+    CustomStack* obj = (CustomStack*)malloc(sizeof(CustomStack));
+    if (!obj) return NULL;
+    
+    obj->data = (int*)malloc(maxSize * sizeof(int));
+    obj->maxSize = maxSize;
+    obj->top = -1; // Stack is initially empty
+    
+    return obj;
+}
+
+// Pushes x onto the stack if it hasn't reached maxSize
+void customStackPush(CustomStack* obj, int x) {
+    if (obj->top < obj->maxSize - 1) {
+        obj->top++;
+        obj->data[obj->top] = x;
+    }
+}
+
+// Pops and returns the top of the stack, or -1 if empty
+int customStackPop(CustomStack* obj) {
+    if (obj->top == -1) {
+        return -1;
+    }
+    int val = obj->data[obj->top];
+    obj->top--;
+    return val;
+}
+
+// Increments the bottom k elements of the stack by val
+void customStackIncrement(CustomStack* obj, int k, int val) {
+    // Increment up to k elements, or all elements if the stack has fewer than k
+    int limit = (k < obj->top + 1) ? k : (obj->top + 1);
+    for (int i = 0; i < limit; i++) {
+        obj->data[i] += val;
+    }
+}
+
+// Frees the allocated memory (Fixed Line 66)
+void customStackFree(CustomStack* obj) {
+    if (obj) {
+        free(obj->data); // Free the inner array first
+        free(obj);       // Then free the struct pointer itself
+    }
+}
