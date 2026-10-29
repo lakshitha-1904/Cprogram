@@ -1,0 +1,80 @@
+#include <stdlib.h>
+
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+double* sampleStats(int* count, int countSize, int* returnSize) {
+    // Allocate memory for the 5 result metrics: [minimum, maximum, mean, median, mode]
+    double* result = (double*)malloc(5 * sizeof(double));
+    *returnSize = 5;
+
+    double min_val = -1;
+    double max_val = -1;
+    double sum = 0;
+    long long total_count = 0;
+    
+    int max_freq = 0;
+    double mode_val = 0;
+
+    // Step 1: Calculate Minimum, Maximum, Mean, and Mode
+    for (int i = 0; i < countSize; i++) {
+        if (count[i] > 0) {
+            if (min_val == -1) {
+                min_val = i;
+            }
+            max_val = i;
+            
+            sum += (double)i * count[i];
+            total_count += count[i];
+            
+            if (count[i] > max_freq) {
+                max_freq = count[i];
+                mode_val = i;
+            }
+        }
+    }
+    
+    double mean_val = sum / total_count;
+
+    // Step 2: Calculate the Median
+    double median_val = 0;
+    
+    // Check if the total number of elements is odd or even
+    if (total_count % 2 != 0) {
+        long long target = total_count / 2 + 1;
+        long long current_count = 0;
+        for (int i = 0; i < countSize; i++) {
+            current_count += count[i];
+            if (current_count >= target) {
+                median_val = i;
+                break;
+            }
+        }
+    } else {
+        long long target1 = total_count / 2;
+        long long target2 = target1 + 1;
+        long long current_count = 0;
+        int m1 = -1, m2 = -1;
+        
+        for (int i = 0; i < countSize; i++) {
+            current_count += count[i];
+            if (m1 == -1 && current_count >= target1) {
+                m1 = i;
+            }
+            if (current_count >= target2) {
+                m2 = i;
+                break;
+            }
+        }
+        median_val = (double)(m1 + m2) / 2.0;
+    }
+
+    // Populate the result array
+    result[0] = min_val;
+    result[1] = max_val;
+    result[2] = mean_val;
+    result[3] = median_val;
+    result[4] = mode_val;
+
+    return result;
+}
